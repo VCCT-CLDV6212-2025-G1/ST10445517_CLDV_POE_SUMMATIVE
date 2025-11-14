@@ -1,5 +1,10 @@
 ﻿@model List<ClassLibrary.Models.Contract>
 
+<div class="mt-4">
+	<a asp-controller="AdminDashBoard" asp-action="Index" class="btn btn-secondary">
+		<i class="fas fa-arrow-left"></i> Back To Dashboard
+	</a>
+</div>
 <h1> Files</h1>
 
 @if (TempData["Message"] != null)

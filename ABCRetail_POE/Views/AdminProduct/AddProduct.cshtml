@@ -5,7 +5,11 @@
 
 <h2 class="text-primary">Add New Product</h2>
 <hr />
-
+<div class="mt-4">
+    <a asp-action="Index" class="btn btn-secondary">
+        <i class="fas fa-arrow-left"></i> Back to List
+    </a>
+</div>
 <div class="row">
     <div class="col-md-6">
         <form asp-action="AddProduct" method="post" enctype="multipart/form-data">

@@ -26,13 +26,12 @@ namespace ABCRetail_POE.ViewModels
         public int StockQuantity { get; set; }
 
         //---------------------------------------------------------------------------------------------------------------------
-        // Field for the actual file upload
+        // used for the actual file upload
         [Required(ErrorMessage = "Please select an image file :(")]
         [Display(Name = "Product Image")]
         public IFormFile? ImageFile { get; set; }
 
         //---------------------------------------------------------------------------------------------------------------------
-        // This will be set by the Controller after successful upload
         public string? ImageUrl { get; set; }
         //---------------------------------------------------------------------------------------------------------------------
     }

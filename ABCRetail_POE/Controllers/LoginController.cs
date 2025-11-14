@@ -48,6 +48,41 @@ namespace ABCRetail_POE.Controllers
             return View("Index", model);
         }
 
+        [HttpGet]
+        public IActionResult Register()
+        {
+            return View(); // Displays the registration form
+        }
+
+        //---------------------------------------------------------------------------------------------------------------------
+        [HttpPost]
+        public async Task<IActionResult> Register(RegisterViewModel model)
+        {
+            if (ModelState.IsValid)
+            {
+                try
+                {
+                    // register the user with a default "Customer" role
+                    //REGISTRATIONS ARE PROHIBITED FOR ADMIN.
+                    //Please find the admin login detials in the documentation provided for the CLDV Summative POE
+                    await _loginService.RegisterUser(model.Name, model.Email, model.Password, "Customer");
+
+                    // Redirect to login page after successful registration
+                    TempData["SuccessMessage"] = "Registration successful! Please log in.";
+                    return RedirectToAction("Index", "Login");
+                }
+                catch (InvalidOperationException ex)
+                {
+                    ModelState.AddModelError("Email", ex.Message); // Email already registered
+                }
+                catch (Exception)
+                {
+                    ModelState.AddModelError(string.Empty, "An unexpected error occurred during registration.");
+                }
+            }
+            return View(model);
+        }
+
         //---------------------------------------------------------------------------------------------------------------------
         public IActionResult Logout()
         {

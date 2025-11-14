@@ -3,12 +3,17 @@
 @{
     ViewData["Title"] = "Customer";
 }
-
-<h1>Index</h1>
+<div class="mt-4">
+    <a asp-controller="AdminDashBoard" asp-action="Index" class="btn btn-secondary">
+        <i class="fas fa-arrow-left"></i> Back To Dashboard
+    </a>
+</div>
+<h1>Customers</h1>
 
 <p>
     <a asp-action="AddCustomer">Create New</a>
 </p>
+
 <table class="table">
     <thead>
         <tr>

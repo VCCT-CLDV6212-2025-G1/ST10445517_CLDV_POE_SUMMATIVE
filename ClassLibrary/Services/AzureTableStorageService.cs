@@ -177,6 +177,24 @@ namespace ClassLibrary.Services
             // ensures the entity is overwritten
             await _orderTableClient.UpdateEntityAsync(orderToUpdate, orderToUpdate.ETag, TableUpdateMode.Replace);
         }
-        //---------------------------------------------------------------------------------------------------------
+
+        //--------------------------------------------------------------------------------------------------------------------
+        public async Task<List<Order>> GetOrdersByCustomerIdAsync(int customerId)
+        {
+            string filter = $"PartitionKey eq '{customerId}'";
+
+            var queryResults = _orderTableClient.QueryAsync<Order>(filter: filter);
+
+            var orders = new List<Order>();
+            await foreach (var entity in queryResults)
+            {
+                orders.Add(entity);
+             }
+
+            return orders;
+        }
+        //--------------------------------------------------------------------------------------------------------------------
     }
 }
+
+//--------------------------------------------------------------END OF FILE----------------------------------------------------------

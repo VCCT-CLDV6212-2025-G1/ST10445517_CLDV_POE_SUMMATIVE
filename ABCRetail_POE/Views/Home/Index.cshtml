@@ -11,10 +11,16 @@
     <div class="col-md-6 offset-md-3 text-center">
         @if (Context.Session.GetString("UserEmail") == null)
         {
-            <a asp-controller="Login" asp-action="Index" class="btn btn-lg shadow-lg"
+            <a asp-controller="Login" asp-action="Index" class="btn btn-lg shadow-lg me-3"
                style="background-color: #663399; color: white; border: none; padding: 15px 40px; border-radius: 50px; font-size: 1.2rem;
-                      font-weight: 600; transition: all 0.3s ease; box-shadow: 0 4px 15px rgba(185, 128, 240, 0.5);">
+                          font-weight: 600; transition: all 0.3s ease; box-shadow: 0 4px 15px rgba(185, 128, 240, 0.5);">
                 Login
+            </a>
+
+            <a asp-controller="Login" asp-action="Register" class="btn btn-lg shadow-lg"
+               style="background-color: #993366; color: white; border: none; padding: 15px 40px; border-radius: 50px; font-size: 1.2rem;
+                          font-weight: 600; transition: all 0.3s ease; box-shadow: 0 4px 15px rgba(240, 128, 185, 0.5);">
+                Register
             </a>
         }
         else

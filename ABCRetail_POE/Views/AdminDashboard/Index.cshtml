@@ -9,6 +9,11 @@
     You are logged in with the role: <strong>@Context.Session.GetString("UserRole")</strong>.
 </p>
 
+<div class="mt-4">
+    <a asp-controller="Home" asp-action="Index" class="btn btn-secondary">
+        <i class="fas fa-arrow-left"></i> Back to Home Page
+    </a>
+</div>
 <div class="row mb-4">
     <div class="col-md-6">
         <div class="card shadow">
@@ -51,7 +56,7 @@
             <div class="card-body">
                 <h5 class="card-title text-success">Customer Management</h5>
                 <p class="card-text">View all customer accounts and add new users.</p>
-                <a asp-controller="AdminCustomer" asp-action="Index" class="btn btn-info">
+                <a asp-controller="Customer" asp-action="Index" class="btn btn-info">
                     Manage Customers
                 </a>
             </div>

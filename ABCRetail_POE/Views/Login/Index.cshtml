@@ -1,0 +1,48 @@
+﻿@model ABCRetail_POE.ViewModels.LoginViewModel
+
+@{
+    ViewData["Title"] = "User Login";
+}
+
+<div class="row">
+    <div class="col-md-6 offset-md-3">
+        <div class="card">
+            <div class="card-header">
+                <h3 class="text-center">Login to ABC Retail</h3>
+            </div>
+            <div class="card-body">
+                <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+
+                <form asp-controller="Login" asp-action="Login" method="post">
+
+                    <div class="form-group mb-3">
+                        <label asp-for="Email" class="control-label"></label>
+                        <input asp-for="Email" class="form-control" />
+                        <span asp-validation-for="Email" class="text-danger"></span>
+                    </div>
+
+                    <div class="form-group mb-3">
+                        <label asp-for="Password" class="control-label"></label>
+                        <input asp-for="Password" class="form-control" />
+                        <span asp-validation-for="Password" class="text-danger"></span>
+                    </div>
+
+                    <div class="form-group mt-4">
+                        <button type="submit" class="btn btn-primary w-100">Log In</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+
+        <p class="text-center mt-3">
+            Don't have an account? <a asp-controller="Login" asp-action="Register">Register here</a>
+        </p>
+
+    </div>
+</div>
+
+@section Scripts {
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+}

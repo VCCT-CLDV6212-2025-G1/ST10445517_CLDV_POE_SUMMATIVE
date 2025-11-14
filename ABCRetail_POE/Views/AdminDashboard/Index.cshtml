@@ -1,0 +1,72 @@
+﻿@{
+    ViewData["Title"] = "Admin Dashboard";
+}
+
+<h1 class="display-4 text-primary">Admin Portal</h1>
+<hr />
+
+<p>
+    You are logged in with the role: <strong>@Context.Session.GetString("UserRole")</strong>.
+</p>
+
+<div class="row mb-4">
+    <div class="col-md-6">
+        <div class="card shadow">
+            <div class="card-body">
+            <h5 class="card-title text-primary">Product Management</h5>
+            <p class="card-text">Add, view, and delete products in the catalog.</p>
+            <a asp-controller="AdminProduct" asp-action="Index" class="btn btn-info">
+                Go to Products
+            </a>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-md-6">
+        <div class="card shadow">
+            <div class="card-body">
+                <h5 class="card-title text-info">Contract/File Upload</h5>
+                <p class="card-text">Upload, view, and download confidential documents.</p>
+                <a asp-controller="Contract" asp-action="Index" class="btn btn-info">
+                Go to Files
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+<div class="row mt-4">
+    <div class="col-md-6">
+        <div class="card shadow">
+            
+                <div class="card-body">
+                    <h5 class="card-title text-primary">Manage Orders</h5>
+                    <p class="card-text">View placed orders and update status</p>
+                    <a asp-controller="Order" asp-action="Index" class="btn btn-info">View All Orders</a>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-md-4 mb-4">
+        <div class="card shadow h-100">
+            <div class="card-body">
+                <h5 class="card-title text-success">Customer Management</h5>
+                <p class="card-text">View all customer accounts and add new users.</p>
+                <a asp-controller="AdminCustomer" asp-action="Index" class="btn btn-info">
+                    Manage Customers
+                </a>
+            </div>
+        </div>
+    </div>
+    
+</div>
+<div class="col-md-6">
+    <div class="card shadow">
+        <div class="card-body">
+            <div class="card-body">
+                <h5 class="card-title text-primary">Logout</h5>
+                <p class="card-text">Click below to securely sign out of the application.</p>
+                <a asp-controller="Login" asp-action="Logout" class="btn btn-info">Log Out</a>
+            </div>
+        </div>
+    </div>
+</div>

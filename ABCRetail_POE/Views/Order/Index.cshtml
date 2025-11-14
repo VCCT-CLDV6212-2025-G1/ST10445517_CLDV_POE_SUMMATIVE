@@ -1,0 +1,67 @@
+﻿@model IEnumerable<ClassLibrary.Models.Order>
+
+@{
+    ViewData["Title"] = "Order";
+}
+
+<h1>Index</h1>
+
+<p>
+    <a asp-action="CreateOrder">Create New</a>
+</p>
+<table class="table">
+    <thead>
+        <tr>
+            <th>
+                @Html.DisplayNameFor(model => model.OrderId)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.PartitionKey)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.RowKey)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.Timestamp)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.CustomerID)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.ProductID)
+            </th>
+            <th></th>
+        </tr>
+    </thead>
+    <tbody>
+@foreach (var item in Model) {
+        <tr>
+            <td>
+                @Html.DisplayFor(modelItem => item.OrderId)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.PartitionKey)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.RowKey)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.Timestamp)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.CustomerID)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.ProductID)
+            </td>
+            <td>
+                    <form asp-action="Delete" method="post" style="display:inline;">
+                        <input type="hidden" name="partitionKey" value="@item.PartitionKey" />
+                        <input type="hidden" name="rowKey" value="@item.RowKey" />
+                        <button type="submit" class=" btn btn-danger" onclick="return confirm('Are you sure you want to delete this order?');">Delete</button>
+                    </form>
+                </td>
+        </tr>
+}
+    </tbody>
+</table>

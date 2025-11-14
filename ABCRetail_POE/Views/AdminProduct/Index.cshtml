@@ -1,0 +1,56 @@
+﻿@model List<ClassLibrary.Models.Product>
+@{
+    ViewData["Title"] = "Admin Product Management";
+}
+
+<h2 class="text-primary">📦 Product Management</h2>
+<hr />
+
+@if (TempData["SuccessMessage"] != null)
+{
+    <div class="alert alert-success">@TempData["SuccessMessage"]</div>
+}
+@if (TempData["ErrorMessage"] != null)
+{
+    <div class="alert alert-danger">@TempData["ErrorMessage"]</div>
+}
+
+<p>
+    <a asp-action="AddProduct" class="btn btn-success"><i class="fas fa-plus-circle"></i> Add New Product</a>
+</p>
+
+<table class="table table-striped table-bordered">
+    <thead>
+        <tr>
+            <th>Image</th>
+            <th>Name</th>
+            <th>Price</th>
+            <th>Stock</th>
+            <th>RowKey</th>
+            <th>Actions</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var product in Model)
+        {
+            <tr>
+                <td>
+                    <img src="@product.ImageUrl" style="width: 50px; height: 50px; object-fit: cover;" alt="@product.ProductName" 
+                         onerror="this.onerror=null;this.src='https://via.placeholder.com/50?text=No+Img';"/>
+                </td>
+                <td>@product.ProductName</td>
+                <td>R @Convert.ToDecimal(product.Price).ToString("F2")</td>
+                <td>@product.StockQuantity</td>
+                <td>@product.RowKey?.Substring(0, 8)...</td>
+                <td>
+                    <form asp-action="DeleteProduct" method="post" onsubmit="return confirm('Are you sure you want to delete @product.ProductName?');">
+                        <input type="hidden" name="partitionKey" value="@product.PartitionKey" />
+                        <input type="hidden" name="rowKey" value="@product.RowKey" />
+                        <input type="hidden" name="imageUrl" value="@product.ImageUrl" />
+                        <button type="submit" class="btn btn-danger btn-sm">Delete</button>
+                    </form>
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>

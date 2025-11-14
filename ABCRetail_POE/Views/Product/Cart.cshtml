@@ -1,0 +1,91 @@
+﻿@model List<ClassLibrary.Models.CartItem>
+@{
+    ViewData["Title"] = "Your Shopping Cart";
+    // Calculate the Grand Total
+    decimal grandTotal = Model.Sum(item => item.Subtotal);
+}
+
+<h2 class="text-primary mb-4">🛒 Your Shopping Cart</h2>
+<hr />
+
+@if (!Model.Any())
+{
+    <div class="alert alert-info" role="alert">
+        Your cart is empty! <a asp-controller="Product" asp-action="Index">Continue Shopping</a>
+    </div>
+}
+else
+{
+    // --- Display Cart Items Table ---
+    <table class="table table-bordered table-striped">
+        <thead>
+            <tr>
+                <th>Product</th>
+                <th class="text-center" style="width: 120px;">Price</th>
+                <th class="text-center" style="width: 120px;">Quantity</th>
+                <th class="text-end" style="width: 120px;">Subtotal</th>
+                <th style="width: 100px;"></th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var item in Model)
+            {
+                <tr>
+                    <td>@item.ProductName</td>
+                    <td class="text-center">R @Convert.ToDecimal(item.Price).ToString("F2")</td>
+
+                    <td class="text-center">
+                        <form asp-controller="Product" asp-action="UpdateCartItem" method="post" class="d-flex justify-content-center">
+                            <input type="hidden" name="productId" value="@item.ProductId" />
+                            <input type="number"
+                                   name="quantity"
+                                   value="@item.Quantity"
+                                   min="1"
+                                   class="form-control form-control-sm"
+                                   style="max-width: 70px;"
+                                   onchange="this.form.submit()" />
+                        </form>
+                    </td>
+
+                    <td class="text-end">R @item.Subtotal.ToString("F2")</td>
+
+                    <td class="text-center">
+                        <form asp-controller="Product" asp-action="RemoveCartItem" method="post">
+                            <input type="hidden" name="productId" value="@item.ProductId" />
+                            <button type="submit" class="btn btn-danger btn-sm" title="Remove Item">
+                                <i class="fas fa-trash"></i>
+                            </button>
+                        </form>
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+
+    <div class="row mt-4">
+        <div class="col-md-6">
+            <a asp-controller="Product" asp-action="Index" class="btn btn-secondary">
+                <i class="fas fa-arrow-left"></i> Continue Shopping
+            </a>
+        </div>
+
+        <div class="col-md-6 text-end">
+            <h4 class="mb-3">Grand Total: <strong class="text-success">R @grandTotal.ToString("F2")</strong></h4>
+
+            <a asp-controller="Order" asp-action="Checkout" class="btn btn-primary btn-lg">
+                Proceed to Checkout <i class="fas fa-credit-card"></i>
+            </a>
+        </div>
+    </div>
+}
+
+@section Scripts {
+    <script>
+        // Optional: Script to automatically submit the quantity update form when value changes
+        document.querySelectorAll('.table input[name="quantity"]').forEach(input => {
+            input.addEventListener('change', function() {
+                this.closest('form').submit();
+            });
+        });
+    </script>
+}

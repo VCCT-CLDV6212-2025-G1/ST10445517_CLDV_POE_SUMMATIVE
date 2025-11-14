@@ -1,0 +1,35 @@
+﻿@{
+    ViewData["Title"] = "Home Page";
+}
+
+<div class="text-center">
+    <h1 class="display-4">ABC Retail</h1>
+    <p>Learn about <a href="https://learn.microsoft.com/aspnet/core">building Web apps with ASP.NET Core</a>.</p>
+</div>
+
+<div class="row mt-5">
+    <div class="col-md-6 offset-md-3 text-center">
+        @if (Context.Session.GetString("UserEmail") == null)
+        {
+            <a asp-controller="Login" asp-action="Index" class="btn btn-lg shadow-lg"
+               style="background-color: #663399; color: white; border: none; padding: 15px 40px; border-radius: 50px; font-size: 1.2rem;
+                      font-weight: 600; transition: all 0.3s ease; box-shadow: 0 4px 15px rgba(185, 128, 240, 0.5);">
+                Login
+            </a>
+        }
+        else
+        {
+            <p class="lead">Welcome back, @Context.Session.GetString("UserEmail")!</p>
+            @if (Context.Session.GetString("UserRole") == "Admin")
+            {
+                <a asp-controller="AdminDashboard" asp-action="Index" class="btn btn-info">Go to Dashboard</a>
+            }
+            else
+            {
+                <a asp-controller="Product" asp-action="Index" class="btn btn-success">Start Shopping</a>
+            }
+            <a asp-controller="Login" asp-action="Logout" class="btn btn-outline-secondary ml-3">Logout</a>
+        }
+    </div>
+</div>
+<hr class="mt-5" />

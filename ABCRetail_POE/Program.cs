@@ -6,6 +6,7 @@ using System.Configuration;
 var builder = WebApplication.CreateBuilder(args);
 var configuration = builder.Configuration;
 
+
 builder.Services.AddHttpClient();
 
 // Add services to the container.
@@ -40,11 +41,19 @@ builder.Services.AddSingleton<BlobService>(sp =>
     return new BlobService(configuration.GetConnectionString("AzureStorage"), configuration, httpClientFactory);
 });
 
-builder.Services.AddSingleton<QueueService>(sp =>
-
+builder.Services.AddScoped<QueueService>(sp =>
 {
-    var connectionString = configuration.GetConnectionString("AzureStorage");
-    return new QueueService(connectionString, "orders");
+    var config = sp.GetRequiredService<IConfiguration>();
+    var httpClientFactory = sp.GetRequiredService<IHttpClientFactory>();
+    // Assuming QueueService constructor takes (IConfiguration, IHttpClientFactory)
+    return new QueueService(config, httpClientFactory);
+});
+
+builder.Services.AddScoped<CustomerFunctionClient>(sp =>
+{
+    var config = sp.GetRequiredService<IConfiguration>();
+    var httpClientFactory = sp.GetRequiredService<IHttpClientFactory>();
+    return new CustomerFunctionClient(config, httpClientFactory);
 });
 
 

@@ -39,7 +39,7 @@ namespace ABCRetail_POE.Controllers
 
             try
             {
-                
+
                 await _azureTableStorageService.UpdateOrderStatusAsync(partitionKey, rowKey, newStatus);
 
                 TempData["SuccessMessage"] = $"Order {rowKey.Substring(0, 8)} status updated to {newStatus}.";
@@ -49,7 +49,7 @@ namespace ABCRetail_POE.Controllers
                 TempData["ErrorMessage"] = $"Failed to update status: {ex.Message}";
             }
 
-            return RedirectToAction("Index"); 
+            return RedirectToAction("Index");
         }
 
         [HttpPost]
@@ -81,11 +81,8 @@ namespace ABCRetail_POE.Controllers
                 foreach (var item in cart)
                 {
                     // creates new Order entity for each product in the cart
-                    // encountered many errors attempting to place many items under a sing order
-                    // wrote it like this because it was the only option that worked
                     var newOrder = new Order
                     {
-                        
                         PartitionKey = customerId.ToString(),
                         RowKey = Guid.NewGuid().ToString(),
                         Timestamp = DateTime.Now,
@@ -94,31 +91,27 @@ namespace ABCRetail_POE.Controllers
                         CustomerID = customerId,
                         ProductID = GetProductIdAsInt(item.ProductId),
                         Status = "PENDING",
-                         Quantity = item.Quantity,
+                        Quantity = item.Quantity,
                         TotalAmount = item.Subtotal
                     };
 
                     
-                    await _azureTableStorageService.AddOrderAsync(newOrder);
+                    await _queueService.SendOrderToFunction(newOrder);
 
                     grandTotal += item.Subtotal;
-
-                    // send a queue message for processing/logging
-                    string queueMessage = $"New web order placed by Customer {customerId} for Product {item.ProductName} (Qty: {item.Quantity}).";
-                    await _queueService.SendMessage(queueMessage);
                 }
 
                 // clear the Session Cart
                 HttpContext.Session.Remove("ShoppingCart");
 
-                 TempData["SuccessMessage"] = $"Your order (Total R {grandTotal:F2}) has been successfully placed! Order ID: {cart.First().ProductId} (Example)";
+                TempData["SuccessMessage"] = $"Your order (Total R {grandTotal:F2}) has been successfully submitted and queued for processing!";
 
                 return RedirectToAction("CustomerOrders", "Order");
             }
             catch (Exception ex)
             {
                 TempData["ErrorMessage"] = $"An error occurred during checkout: {ex.Message}";
-                  return RedirectToAction("Cart", "Product");
+                return RedirectToAction("Cart", "Product");
             }
         }
         //---------------------------------------------------------------------------------------------------------------------
@@ -127,7 +120,7 @@ namespace ABCRetail_POE.Controllers
             var customers = await _azureTableStorageService.GetAllCustomerAsync();
             var products = await _azureTableStorageService.GetAllProductsAsync();
 
-            if(customers == null || customers.Count == 0)
+            if (customers == null || customers.Count == 0)
             {
                 ModelState.AddModelError("", "No Customers found. Please add one");
             }
@@ -143,17 +136,17 @@ namespace ABCRetail_POE.Controllers
 
         //---------------------------------------------------------------------------------------------------------------------
         [HttpPost]
-        public async Task<IActionResult>CreateOrder(Order order)
+        public async Task<IActionResult> CreateOrder(Order order)
         {
-            if(ModelState.IsValid)
+            if (ModelState.IsValid)
             {
                 order.PartitionKey = "OrderPartition";
                 order.RowKey = Guid.NewGuid().ToString();
                 order.Timestamp = DateTime.Now;
-                await _azureTableStorageService.AddOrderAsync(order);
 
-                string message = $"New order for {order.CustomerID}"+ $"for {order.ProductID}";
-                await _queueService.SendMessage(message);
+                await _queueService.SendOrderToFunction(order);
+
+                TempData["SuccessMessage"] = $"New order created and sent for processing!";
                 return RedirectToAction("Index");
             }
 
@@ -174,13 +167,10 @@ namespace ABCRetail_POE.Controllers
             return 0;
         }
 
-
-
-
         public async Task<IActionResult> CustomerOrders()
         {
             var customerId = HttpContext.Session.GetInt32("UserID");
-            if (customerId == null || customerId == 0) // Check for 0 as well, just in case
+            if (customerId == null || customerId == 0)
             {
                 TempData["ErrorMessage"] = "Please log in to view your orders.";
                 return RedirectToAction("Index", "Login");
@@ -197,10 +187,5 @@ namespace ABCRetail_POE.Controllers
                 return View(new List<ClassLibrary.Models.Order>());
             }
         }
-
     }
-    //---------------------------------------------------------------------------------------------------------------------
-
-
 }
-//---------------------------------------------------END OF FILE---------------------------------------------------------------

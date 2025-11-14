@@ -15,16 +15,19 @@ namespace ABCRetail_POE.Functions
     {
         private readonly ILogger<CreateCustomerFunction> _logger;
         private readonly AzureTableStorageService _azureTableStorageService;
+        private readonly FileService _fileService;
 
         public CreateCustomerFunction(
             ILogger<CreateCustomerFunction> logger,
-            AzureTableStorageService azureTableStorageService)
+            AzureTableStorageService azureTableStorageService,
+            FileService fileService)
         {
             _logger = logger;
             _azureTableStorageService = azureTableStorageService;
+            _fileService = fileService;
         }
 
-        [Function("CreateCustomer")]
+        [Function("HandleNewCustomer")]
         public async Task<HttpResponseData> Run(
             [HttpTrigger(AuthorizationLevel.Function, "post", Route = "customers")] HttpRequestData req)
         {
@@ -94,14 +97,24 @@ namespace ABCRetail_POE.Functions
 
                 // Add customer to Azure Table Storage
                 await _azureTableStorageService.AddCustomerAsync(customer);
+//---------------------------------------------------------------
+                _logger.LogInformation($"Customer {customer.CustomerName} created successfully created in Table Storage");
+                string defaultContractContent = $"Welcome Contract for Customer ID: {customer.CustomerID} ({customer.CustomerName})";
+                string fileShareName = $"initial_contract_{customer.CustomerID}.txt";
 
-                _logger.LogInformation($"Customer {customer.CustomerName} created successfully with RowKey: {customer.RowKey}");
+                using (var stream = new MemoryStream(System.Text.Encoding.UTF8.GetBytes(defaultContractContent)))
+                {
+                    // Use a specific directory
+                    await _fileService.UploadFileAsync("onboarding", fileShareName, stream);
+                    _logger.LogInformation($"Default contract uploaded to Azure Files: {fileShareName}");
+                }
 
+                //---------------------------------------------
                 // Return success response
                 var response = req.CreateResponse(HttpStatusCode.OK);
                 await response.WriteAsJsonAsync(new
                 {
-                    message = "Customer created successfully",
+                    message = "Customer created successfully and new contract filed",
                     customerId = customer.RowKey,
                     customerName = customer.CustomerName,
                     partitionKey = customer.PartitionKey

@@ -1,18 +1,42 @@
-﻿using Azure.Storage.Queues;
+﻿using System.Net.Http;
+using Microsoft.Extensions.Configuration;
+using System;
+using System.Text.Json;
+using ClassLibrary.Models;
 
 namespace ClassLibrary.Services
 {
+    
     public class QueueService
     {
-        private readonly QueueClient _queueClient;
-        public QueueService(string connectionString, string queueName)
+        
+        private readonly HttpClient _httpClient;
+        private readonly string _functionAppUrl;
+        private readonly string _functionApiKey;
+       
+        public QueueService(IConfiguration configuration, IHttpClientFactory httpClientFactory)
         {
-            _queueClient =new QueueClient(connectionString, queueName);
+
+            _httpClient = httpClientFactory.CreateClient();
+
+            // Read URL and Key from Configuration
+            _functionAppUrl = configuration["FunctionAppUrl"]
+                              ?? throw new ArgumentNullException("FunctionAppUrl is not configured.");
+            _functionApiKey = configuration["FunctionApiKey"]
+                              ?? throw new ArgumentNullException("FunctionApiKey is not configured.");
         }
 
-        public async Task SendMessage(string message)
+        public async Task SendOrderToFunction(Order order)
         {
-            await _queueClient.SendMessageAsync(message);
+            string requestUrl = $"{_functionAppUrl}orders/queue?code={_functionApiKey}";
+
+            var json = JsonSerializer.Serialize(order);
+            var content = new StringContent(json, System.Text.Encoding.UTF8, "application/json");
+
+            var response = await _httpClient.PostAsync(requestUrl, content);
+
+            response.EnsureSuccessStatusCode();
         }
+
     }
 }
